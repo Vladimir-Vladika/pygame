@@ -8,6 +8,14 @@ from score import Score
 
 
 class Game:
+    """
+    Главный класс игры.
+    Управляет:
+    - змейкой
+    - едой
+    - счетом
+    - игровым циклом
+    """
 
     def __init__(self):
 
@@ -19,14 +27,10 @@ class Game:
         pygame.display.set_caption("Snake")
 
 
-        # Игровые объекты
+        # Создаем объекты игры
         self.snake = Snake()
         self.food = Food()
         self.score = Score()
-
-
-        # Направление движения
-        self.direction = "RIGHT"
 
 
         # Игровые часы
@@ -35,9 +39,8 @@ class Game:
 
 
     def run(self):
-
         """
-        Главный игровой цикл
+        Главный цикл игры.
         """
 
         while True:
@@ -53,66 +56,69 @@ class Game:
 
 
     def events(self):
-
         """
-        Обработка нажатий клавиш
+        Обработка событий и управления.
         """
 
         for event in pygame.event.get():
 
+            # Закрытие окна
             if event.type == pygame.QUIT:
+
                 pygame.quit()
                 sys.exit()
 
 
 
+            # Управление змейкой
             if event.type == pygame.KEYDOWN:
 
 
                 if event.key == pygame.K_UP:
-                    if self.direction != "DOWN":
-                        self.direction = "UP"
 
+                    self.snake.change_direction(
+                        (0, -1)
+                    )
 
 
                 elif event.key == pygame.K_DOWN:
-                    if self.direction != "UP":
-                        self.direction = "DOWN"
 
+                    self.snake.change_direction(
+                        (0, 1)
+                    )
 
 
                 elif event.key == pygame.K_LEFT:
-                    if self.direction != "RIGHT":
-                        self.direction = "LEFT"
 
+                    self.snake.change_direction(
+                        (-1, 0)
+                    )
 
 
                 elif event.key == pygame.K_RIGHT:
-                    if self.direction != "LEFT":
-                        self.direction = "RIGHT"
 
+                    self.snake.change_direction(
+                        (1, 0)
+                    )
 
 
 
 
     def update(self):
-
         """
-        Обновление состояния игры
+        Обновление логики игры.
         """
 
-        # двигаем змейку
-        self.snake.move(
-            self.direction
-        )
+        # Двигаем змейку
+        self.snake.move()
 
 
 
-        # проверяем еду
+        # Проверяем, съела ли змейка еду
 
         if self.snake.body[0] == self.food.position:
 
-            self.snake.grow()
+            self.snake.grow_up()
 
             self.food.randomize()
 
@@ -120,25 +126,17 @@ class Game:
 
 
 
-        # проверяем столкновение со стеной
+        # Проверяем столкновение со стеной
 
-        head = self.snake.body[0]
-
-
-        if (
-            head[0] < 0 or
-            head[0] >= WIDTH or
-            head[1] < 0 or
-            head[1] >= HEIGHT
-        ):
+        if self.snake.check_wall_collision():
 
             self.game_over()
 
 
 
-        # проверяем столкновение с собой
+        # Проверяем столкновение с собой
 
-        if head in self.snake.body[1:]:
+        if self.snake.check_self_collision():
 
             self.game_over()
 
@@ -146,39 +144,45 @@ class Game:
 
 
     def draw(self):
-
         """
-        Отрисовка игры
+        Отрисовка всех объектов.
         """
 
-
+        # Очистка экрана
         self.screen.fill(BLACK)
 
 
+
+        # Рисуем еду
         self.food.draw(
             self.screen
         )
 
 
+
+        # Рисуем змейку
         self.snake.draw(
             self.screen
         )
 
 
+
+        # Рисуем счет
         self.score.draw(
             self.screen
         )
 
 
+
+        # Обновляем экран
         pygame.display.update()
 
 
 
 
     def game_over(self):
-
         """
-        Завершение игры
+        Завершение игры.
         """
 
         pygame.quit()
