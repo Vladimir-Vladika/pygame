@@ -84,12 +84,8 @@ while True:
             elif event.key == pygame.K_RIGHT and direction != "LEFT":
                 direction = "RIGHT"
 
-
-
     # Движение змейки
     snake.move(direction)
-
-
 
     # Проверка съедания еды
     if snake.body[0] == food.position:
